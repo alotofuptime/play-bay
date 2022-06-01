@@ -1,0 +1,26 @@
+{
+  "devDependencies": {
+    "playwright": "^1.22.2"
+  },
+  "name": "play-bay",
+  "description": "",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "playwright-core": "^1.22.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alotofuptime/play-bay.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alotofuptime/play-bay/issues"
+  },
+  "homepage": "https://github.com/alotofuptime/play-bay#readme"
+}
