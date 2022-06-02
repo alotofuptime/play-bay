@@ -3,8 +3,8 @@ image:
   file: .gitpod.Dockerfile
 
 tasks:
-  # - before: |
-      # make install
+  - before: |
+      make install
     - command: echo 'start script'
 
 # List the ports to expose. Learn more https://www.gitpod.io/docs/config-ports/
