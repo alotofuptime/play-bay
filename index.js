@@ -31,4 +31,33 @@ const login = async () => {
   await browser.close();
 };
 
-login();
+// login();
+
+const getQuotes = async () => {
+  const browser = await chromium.launch();
+  const context = await browser.newContext({ storageState: "state.json" });
+  const page = await context.newPage();
+  await page.goto("https://quotes.toscrape.com");
+  const quoteDivs = await page.evaluate(() => {
+    divs = document.querySelectorAll('.quote');
+    let quotes = [];
+    divs.forEach((div) => {
+      const quoteSpans = div.querySelectorAll('span');
+      const quoteTagLinks = div.querySelectorAll('a.tag');
+      const quote = quoteSpans[0];
+      const author = quoteSpans[1];
+      const tags = [...quoteTagLinks].map(item => item.innerText)
+      const authorName = author.querySelector("small");
+      quotes.push({
+        quote: quote.innerText,
+        author: authorName.innerText,
+        tags: tags
+      });
+    });
+    return quotes
+    });
+  console.log(quoteDivs)
+  await browser.close();
+};
+
+getQuotes();
