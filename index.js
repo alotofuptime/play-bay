@@ -39,24 +39,24 @@ const getQuotes = async () => {
   const page = await context.newPage();
   await page.goto("https://quotes.toscrape.com");
   const quoteDivs = await page.evaluate(() => {
-    divs = document.querySelectorAll('.quote');
+    divs = document.querySelectorAll(".quote");
     let quotes = [];
     divs.forEach((div) => {
-      const quoteSpans = div.querySelectorAll('span');
-      const quoteTagLinks = div.querySelectorAll('a.tag');
+      const quoteSpans = div.querySelectorAll("span");
+      const quoteTagLinks = div.querySelectorAll("a.tag");
       const quote = quoteSpans[0];
       const author = quoteSpans[1];
-      const tags = [...quoteTagLinks].map(item => item.innerText)
+      const tags = [...quoteTagLinks].map((item) => item.innerText);
       const authorName = author.querySelector("small");
       quotes.push({
         quote: quote.innerText,
         author: authorName.innerText,
-        tags: tags
+        tags: tags,
       });
     });
-    return quotes
-    });
-  console.log(quoteDivs)
+    return quotes;
+  });
+  console.log(quoteDivs);
   await browser.close();
 };
 
