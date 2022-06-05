@@ -1,4 +1,4 @@
-install:
-	npm install playwright && npm i puppeteer\
+install: |
+	npm ci && \
 	npx playwright install && \
 	npx playwright install-deps
