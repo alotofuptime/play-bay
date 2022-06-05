@@ -4,20 +4,46 @@ const puppeteer = require("puppeteer");
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
   await page.goto("https://news.ycombinator.com/");
-    const tableRows = page.$$eval("tr.athing", (rows) =>
-      rows.map((row) => row.innerHTML))
+  const tableRows = await page.$$("table.itemlist > tbody > tr.athing");
+  const subtextTableRows = await page.$$(
+    "table.itemlist > tbody > tr > td.subtext"
+  );
+  let titlesAndUrls = [], datesAndVotes = [];
 
-  // let articleTitles = page.$$eval("a.titlelink", (titles) =>
-  //   titles.map((item) => item.textContent)
-  // );
+  let title, link
+  for (const tableRow of tableRows) {
+    title = await page.evaluate(
+      (el) => el.querySelector("a.titlelink").textContent,
+      tableRow
+    );
 
-  // let articleLinks = page.$$eval("a.titlelink", (links) =>
-  //   links.map((item) => item.href)
-  // );
-  // // edge case: some articles have 0 votes
-  // let articleUpVotes = page.$$eval("span.score", (spans) =>
-  //   spans.map((item) => (item.textContent))
-  // );
-  console.log(await tableRows);
+    link = await page.evaluate(
+      (el) => el.querySelector("a.titlelink").getAttribute("href"),
+      tableRow
+    );
+
+    titlesAndUrls.push({ title, link });
+    // console.log(points)
+  }
+
+  let points, date;
+  for (const subtextRow of subtextTableRows) {
+    try {
+      points = await page.evaluate(
+        (el) => el.querySelector("span.score").textContent,
+        subtextRow
+      );
+
+    } catch (err) {
+      points = "Null";
+    }
+    date = await page.evaluate(
+      (el) => el.querySelector("span.age").getAttribute("title"),
+      subtextRow
+    )
+    datesAndVotes.push({ date, points });
+  }
+  console.log(datesAndVotes)
+
   await browser.close();
 })();
