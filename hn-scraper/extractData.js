@@ -1,57 +1,57 @@
-const puppeteer = require("puppeteer");
+const puppeteer = require('puppeteer');
 
 (async () => {
   const browser = await puppeteer.launch();
-  const url = "https://news.ycombinator.com/";
+  const url = 'https://news.ycombinator.com/';
   const page = await browser.newPage();
   await page.goto(url);
-  const tableRows = await page.$$("table.itemlist > tbody > tr.athing");
+  const tableRows = await page.$$('table.itemlist > tbody > tr.athing');
   const subtextTableRows = await page.$$(
-    "table.itemlist > tbody > tr > td.subtext"
+      'table.itemlist > tbody > tr > td.subtext',
   );
-  let titlesAndUrls = [],
-    datesAndVotes = [];
+  const titlesAndUrls = [];
+  const datesAndVotes = [];
 
-  let title, link;
+  let title; let link;
   for (const tableRow of tableRows) {
     title = await page.evaluate(
-      (el) => el.querySelector("a.titlelink").textContent,
-      tableRow
+        (el) => el.querySelector('a.titlelink').textContent,
+        tableRow,
     );
 
     link = await page.evaluate(
-      (el) => el.querySelector("a.titlelink").getAttribute("href"),
-      tableRow
+        (el) => el.querySelector('a.titlelink').getAttribute('href'),
+        tableRow,
     );
-    if (link.includes("item?id")) {
+    if (link.includes('item?id')) {
       link = url + link;
     }
 
-    titlesAndUrls.push({ title, link });
+    titlesAndUrls.push({title, link});
   }
 
-  let points, date;
+  let points; let date;
   for (const subtextRow of subtextTableRows) {
     try {
       points = await page.evaluate(
-        (el) => el.querySelector("span.score").textContent,
-        subtextRow
+          (el) => el.querySelector('span.score').textContent,
+          subtextRow,
       );
-      points = parseInt(points.split(" ")[0]);
+      points = parseInt(points.split(' ')[0]);
     } catch (err) {
       points = 0;
     }
     date = await page.evaluate(
-      (el) => el.querySelector("span.age").getAttribute("title"),
-      subtextRow
+        (el) => el.querySelector('span.age').getAttribute('title'),
+        subtextRow,
     );
 
     date = new Date(date);
-    datesAndVotes.push({ date, points });
+    datesAndVotes.push({date, points});
   }
   const articles = [];
   titlesAndUrls.forEach((titleAndUrl, index) => {
-    let dateAndVote = datesAndVotes[index];
+    const dateAndVote = datesAndVotes[index];
     articles.push(Object.assign(titleAndUrl, dateAndVote));
   });
   console.log(articles);

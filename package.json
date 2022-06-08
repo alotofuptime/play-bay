@@ -1,5 +1,6 @@
 {
   "devDependencies": {
+    "eslint": "^8.17.0",
     "playwright": "^1.22.2"
   },
   "name": "play-bay",
