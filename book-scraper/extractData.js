@@ -2,8 +2,9 @@ const puppeteer = require("puppeteer");
 
 (async () => {
   const browser = await puppeteer.launch();
+  const url = "https://news.ycombinator.com/";
   const page = await browser.newPage();
-  await page.goto("https://news.ycombinator.com/");
+  await page.goto(url);
   const tableRows = await page.$$("table.itemlist > tbody > tr.athing");
   const subtextTableRows = await page.$$(
     "table.itemlist > tbody > tr > td.subtext"
@@ -22,6 +23,9 @@ const puppeteer = require("puppeteer");
       (el) => el.querySelector("a.titlelink").getAttribute("href"),
       tableRow
     );
+    if (link.includes("item?id")) {
+      link = url + link;
+    }
 
     titlesAndUrls.push({ title, link });
   }
@@ -33,13 +37,16 @@ const puppeteer = require("puppeteer");
         (el) => el.querySelector("span.score").textContent,
         subtextRow
       );
+      points = parseInt(points.split(" ")[0]);
     } catch (err) {
-      points = "Null";
+      points = 0;
     }
     date = await page.evaluate(
       (el) => el.querySelector("span.age").getAttribute("title"),
       subtextRow
     );
+
+    date = new Date(date);
     datesAndVotes.push({ date, points });
   }
   const articles = [];
