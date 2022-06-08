@@ -1,27 +1,62 @@
 const scraperObject = {
   url: "https://news.ycombinator.com/",
   async scraper(browser) {
-    let page = await browser.newPage();
-    console.log(`Navigating to ${this.url} ...`);
-    // Navigate to the selected page
-    await page.goto(this.url);
-    // Wait for required DOM to be rendered
-    await page.waitForSelector(".page_inner");
-    // Get the link to all required books
-    let urls = await page.$$eval("section ol > li", (links) => {
-      // Make sure book to be scraped is in stock
-      links = links.filter(
-        (link) =>
-          link.querySelector(".instock.availability > i").textContent !==
-          " In stock "
-      );
-      // Extract the links from the data
-      links = links.map((el) => el.querySelector("h3 > a").href);
-      return links;
-    });
-    console.log(urls);
-    await browser.close();
-  },
-};
 
-module.exports = scraperObject;
+    const page = await browser.newPage();
+    await page.goto(this.url);
+    const tableRows = await page.$$("table.itemlist > tbody > tr.athing");
+    const subtextTableRows = await page.$$(
+        "table.itemlist > tbody > tr > td.subtext"
+    );
+    let titlesAndUrls = [],
+        datesAndVotes = [];
+
+    let title, link;
+    for (const tableRow of tableRows) {
+        title = await page.evaluate(
+        (el) => el.querySelector("a.titlelink").textContent,
+        tableRow
+        );
+
+        link = await page.evaluate(
+        (el) => el.querySelector("a.titlelink").getAttribute("href"),
+        tableRow
+        );
+        if (link.includes("item?id")) {
+        link = this.url + link;
+        }
+
+        titlesAndUrls.push({ title, link });
+    }
+
+    let points, date;
+    for (const subtextRow of subtextTableRows) {
+        try {
+        points = await page.evaluate(
+            (el) => el.querySelector("span.score").textContent,
+            subtextRow
+        );
+        points = parseInt(points.split(" ")[0]);
+        } catch (err) {
+        points = 0;
+        }
+        date = await page.evaluate(
+        (el) => el.querySelector("span.age").getAttribute("title"),
+        subtextRow
+        );
+
+        date = new Date(date);
+        datesAndVotes.push({ date, points });
+    }
+    const articles = [];
+    titlesAndUrls.forEach((titleAndUrl, index) => {
+        let dateAndVote = datesAndVotes[index];
+        articles.push(Object.assign(titleAndUrl, dateAndVote));
+    });
+    console.log(articles);
+
+    await browser.close();
+    }
+}
+
+module.exports = scraperObject
